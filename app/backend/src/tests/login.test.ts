@@ -5,7 +5,7 @@ import { before } from 'mocha';
 import chaiHttp = require('chai-http');
 
 import { app } from '../app';
-import UserModel from '../database/models/UserModel';
+import UsersModel from '../database/models/UsersModel';
 
 import { Response } from 'superagent';
 
@@ -17,19 +17,19 @@ describe('Testa a rota "/login"', () => {
 
   before(async () => {
     sinon
-      .stub(UserModel, 'findAll')
+      .stub(UsersModel, 'findAll')
       .resolves([{
         username: '',
         role: '',
         email: '',
         password: '',
-      }] as UserModel[]);
+      }] as UsersModel[]);
     // sinon.stub(UserService, 'generateJwtToken')
     //   .callsFake(() => '');
   });
 
   after(()=>{
-    (UserModel.findAll as sinon.SinonStub).restore();
+    (UsersModel.findAll as sinon.SinonStub).restore();
   });
 
   const loginData = { email: 'user@user.com', password: 'secret_user' };
