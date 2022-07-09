@@ -37,7 +37,7 @@ class App {
         return controller.login(req, res, next);
       },
     );
-  
+
     this.app.use(errorMiddleware);
   }
 
