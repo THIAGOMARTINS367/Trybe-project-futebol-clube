@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import IUser from '../interfaces/IUser';
 import IResponseError from '../interfaces/IResponseError';
 import IToken from '../interfaces/IToken';
 import IUserLogin from '../interfaces/IUserLogin';
@@ -14,6 +15,17 @@ class UsersController {
       return next(result);
     }
     res.status(200).json(result);
+  }
+
+  async getUserRole(req: Request, res: Response, next: NextFunction): Promise<void> {
+    const { userData } = req.headers;
+    const user = userData as string;
+    const userDataFormatted: IUser = JSON.parse(user);
+    const result: string | IResponseError = await this.service.getUserRole(userDataFormatted);
+    if (Object.keys(result).includes('error')) {
+      return next(result);
+    }
+    res.status(200).json({ role: result });
   }
 }
 
