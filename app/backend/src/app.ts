@@ -3,6 +3,7 @@ import UsersController from './controllers/UsersController';
 import UsersRepository from './repository/UsersRepository';
 import UsersService from './services/UsersService';
 import errorMiddleware from './middlewares/error';
+import TokenAuthenticator from './middlewares/TokenAuthenticator';
 
 class App {
   public app: express.Express;
@@ -35,6 +36,19 @@ class App {
         const service = new UsersService(repository);
         const controller = new UsersController(service);
         return controller.login(req, res, next);
+      },
+    );
+
+    this.app.get(
+      '/login/validate',
+      (req: express.Request, _res: express.Response, next: express.NextFunction) => {
+        new TokenAuthenticator(req, next).validateJwtToken();
+      },
+      (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        const repository = new UsersRepository();
+        const service = new UsersService(repository);
+        const controller = new UsersController(service);
+        return controller.getUserRole(req, res, next);
       },
     );
 
