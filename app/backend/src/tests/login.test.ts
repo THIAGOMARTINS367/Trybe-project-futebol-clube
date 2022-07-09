@@ -57,8 +57,8 @@ describe('Testa a rota "/login"', () => {
     requestBody.email = 'useruser.com';
     const chaiHttpResponse: Response = await chai.request(app)
       .post('/login').send(requestBody);
-    expect(chaiHttpResponse.status).to.be.equal(200);
-    expect(chaiHttpResponse.body).to.be.eql({ message: '' });
+    expect(chaiHttpResponse.status).to.be.equal(400);
+    expect(chaiHttpResponse.body).to.be.eql({ message: '\"email\" must be a valid email' });
   });
 
   it(`Uma requisição na rota "POST /login" passando email correto e password inválido
@@ -67,8 +67,47 @@ describe('Testa a rota "/login"', () => {
     requestBody.password = '123456';
     const chaiHttpResponse: Response = await chai.request(app)
       .post('/login').send(requestBody);
-    expect(chaiHttpResponse.status).to.be.equal(200);
-    expect(chaiHttpResponse.body).to.be.eql({ message: '' });
+    expect(chaiHttpResponse.status).to.be.equal(400);
+    expect(chaiHttpResponse.body).to.be.eql({ message: '\"password\" length must be at least 7 characters long' });
+  });
+
+  it(`Uma requisição na rota "POST /login" passando email vazio e password correto
+    retorna um objeto que contém o atributo "message" com uma mensagem de erro`, async () => {
+    const requestBody = { ...loginData };
+    requestBody.email = '';
+    const chaiHttpResponse: Response = await chai.request(app)
+      .post('/login').send(requestBody);
+    expect(chaiHttpResponse.status).to.be.equal(400);
+    expect(chaiHttpResponse.body).to.be.eql({ message: 'All fields must be filled' });
+  });
+
+  it(`Uma requisição na rota "POST /login" passando somente o atributo password, correto,
+    retorna um objeto que contém o atributo "message" com uma mensagem de erro`, async () => {
+    const { password } = loginData;
+    const requestBody = { password };
+    const chaiHttpResponse: Response = await chai.request(app)
+      .post('/login').send(requestBody);
+    expect(chaiHttpResponse.status).to.be.equal(400);
+    expect(chaiHttpResponse.body).to.be.eql({ message: 'All fields must be filled' });
+  });
+
+  it(`Uma requisição na rota "POST /login" passando email correto e password vazio
+    retorna um objeto que contém o atributo "message" com uma mensagem de erro`, async () => {
+    const requestBody = { ...loginData };
+    requestBody.password = '';
+    const chaiHttpResponse: Response = await chai.request(app)
+      .post('/login').send(requestBody);
+    expect(chaiHttpResponse.status).to.be.equal(400);
+    expect(chaiHttpResponse.body).to.be.eql({ message: 'All fields must be filled' });
+  });
+
+  it(`Uma requisição na rota "POST /login" passando somente o atributo email, correto,
+    retorna um objeto que contém o atributo "message" com uma mensagem de erro`, async () => {
+    const requestBody = { email: loginData.email };
+    const chaiHttpResponse: Response = await chai.request(app)
+      .post('/login').send(requestBody);
+    expect(chaiHttpResponse.status).to.be.equal(400);
+    expect(chaiHttpResponse.body).to.be.eql({ message: 'All fields must be filled' });
   });
 });
 
