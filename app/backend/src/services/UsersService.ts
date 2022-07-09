@@ -7,6 +7,7 @@ import generateJwtToken from '../utils/generateJwtToken';
 import Bcrypt from '../utils/Bcrypt';
 import IToken from '../interfaces/IToken';
 import IResponseError from '../interfaces/IResponseError';
+import { ALL_FIELDS_MUST_BE_FILLED, ANY_REQUIRED, STRING_EMPTY } from '../constants';
 
 class UsersService implements IUsersService {
   constructor(
@@ -19,10 +20,14 @@ class UsersService implements IUsersService {
     const { error } = object.keys({
       email: string.email().not().empty().required()
         .messages({
-          'string.empty': 'All fields must be filled',
-          'any.required': 'All fields must be filled',
+          [STRING_EMPTY]: ALL_FIELDS_MUST_BE_FILLED,
+          [ANY_REQUIRED]: ALL_FIELDS_MUST_BE_FILLED,
         }),
-      password: string.not().empty().min(7).required(),
+      password: string.not().empty().min(7).required()
+        .messages({
+          [STRING_EMPTY]: ALL_FIELDS_MUST_BE_FILLED,
+          [ANY_REQUIRED]: ALL_FIELDS_MUST_BE_FILLED,
+        }),
     }).validate({ email, password });
     return error;
   }
