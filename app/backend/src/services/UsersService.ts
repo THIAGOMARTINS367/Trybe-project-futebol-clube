@@ -17,10 +17,11 @@ class UsersService implements IUsersService {
   validateLoginFields({ email, password }: IUserLogin) {
     const { object, string } = this.joiTypes;
     const { error } = object.keys({
-      email: string.email().not().empty().required().messages({
-        'string.empty': 'All fields must be filled',
-        'any.required': 'All fields must be filled',
-      }),
+      email: string.email().not().empty().required()
+        .messages({
+          'string.empty': 'All fields must be filled',
+          'any.required': 'All fields must be filled',
+        }),
       password: string.not().empty().min(7).required(),
     }).validate({ email, password });
     return error;
