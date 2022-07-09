@@ -49,6 +49,15 @@ class UsersService implements IUsersService {
     const userToken: string = generateJwtToken(user[0]);
     return { token: userToken };
   }
+
+  async getUserRole(userData: IUser): Promise<string | IResponseError> {
+    const { id }: { id: number } = userData;
+    const role: string | null = await this.repository.getUserRole(id);
+    if (!role) {
+      return { error: { code: 404, message: 'User does not exist' } };
+    }
+    return role;
+  }
 }
 
 export default UsersService;
