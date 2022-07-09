@@ -16,6 +16,11 @@ class UsersRepository implements IUsersRepository {
     });
     return user;
   }
+
+  async getUserRole(id: number): Promise<string | null> {
+    const user = await this.model.findByPk(id);
+    return user ? user.getDataValue('role') : null as string | null;
+  }
 }
 
 export default UsersRepository;
