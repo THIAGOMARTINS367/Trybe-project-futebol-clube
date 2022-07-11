@@ -1,9 +1,6 @@
 import * as express from 'express';
-import UsersController from './controllers/UsersController';
-import UsersRepository from './repository/UsersRepository';
-import UsersService from './services/UsersService';
 import errorMiddleware from './middlewares/error';
-import TokenAuthenticator from './middlewares/TokenAuthenticator';
+import routes from './routes';
 
 class App {
   public app: express.Express;
@@ -25,33 +22,9 @@ class App {
       res.header('Access-Control-Allow-Headers', '*');
       next();
     };
-
     this.app.use(express.json());
     this.app.use(accessControl);
-
-    this.app.post(
-      '/login',
-      (req: express.Request, res: express.Response, next: express.NextFunction) => {
-        const repository = new UsersRepository();
-        const service = new UsersService(repository);
-        const controller = new UsersController(service);
-        return controller.login(req, res, next);
-      },
-    );
-
-    this.app.get(
-      '/login/validate',
-      (req: express.Request, _res: express.Response, next: express.NextFunction) => {
-        new TokenAuthenticator(req, next).validateJwtToken();
-      },
-      (req: express.Request, res: express.Response, next: express.NextFunction) => {
-        const repository = new UsersRepository();
-        const service = new UsersService(repository);
-        const controller = new UsersController(service);
-        return controller.getUserRole(req, res, next);
-      },
-    );
-
+    this.app.use(routes);
     this.app.use(errorMiddleware);
   }
 
