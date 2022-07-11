@@ -9,6 +9,11 @@ class TeamsRepository implements ITeamsRepository {
     const teams: ITeam[] = await this.model.findAll();
     return teams;
   }
+
+  async getTeamById(id: number): Promise<ITeam | null> {
+    const team: ITeam | null = await this.model.findByPk(id);
+    return team;
+  }
 }
 
 export default TeamsRepository;
