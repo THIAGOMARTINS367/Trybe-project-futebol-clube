@@ -5,7 +5,7 @@ import db from '.';
 class TeamsModel extends Model {
   // public <campo>!: <tipo>;
   public id: number;
-  public team_name: string;
+  public teamName: string;
 }
 
 TeamsModel.init({
@@ -14,8 +14,9 @@ TeamsModel.init({
     allowNull: false,
     type: DataTypes.INTEGER,
   },
-  team_name: {
+  teamName: {
     allowNull: false,
+    field: 'team_name',
     type: DataTypes.STRING,
   },
 }, {
