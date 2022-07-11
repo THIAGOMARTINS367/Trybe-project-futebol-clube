@@ -152,7 +152,7 @@ describe('Testa a rota "GET /login/validate"', () => {
   });
 
   after(()=>{
-    (UsersModel.findAll as sinon.SinonStub).restore();
+    (UsersModel.findByPk as sinon.SinonStub).restore();
   });
 
   it(`Uma requisição na rota "GET /login/validate" passando o token correto no
