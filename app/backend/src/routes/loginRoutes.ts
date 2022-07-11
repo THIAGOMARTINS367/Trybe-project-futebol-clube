@@ -1,8 +1,17 @@
 import { Request, Response, NextFunction, Router } from 'express';
 import TokenAuthenticator from '../middlewares/TokenAuthenticator';
-import entityFactory from '../utils/entityFactory';
+import UsersController from '../controllers/UsersController';
+import UsersRepository from '../repository/UsersRepository';
+import UsersService from '../services/UsersService';
 
 const userRouter = Router();
+
+const entityFactory = () => {
+  const repository = new UsersRepository();
+  const service = new UsersService(repository);
+  const controller = new UsersController(service);
+  return controller;
+};
 
 userRouter.post('/', (req: Request, res: Response, next: NextFunction) => {
   entityFactory().login(req, res, next);
