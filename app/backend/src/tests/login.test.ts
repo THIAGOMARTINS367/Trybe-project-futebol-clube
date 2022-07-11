@@ -8,17 +8,21 @@ import { app } from '../app';
 import UsersModel from '../database/models/UsersModel';
 
 import { Response } from 'superagent';
+import { validTokenForTests } from '../constants';
 
 chai.use(chaiHttp);
 
 const { expect } = chai;
 
-describe('Testa a rota "/login"', () => {
+const INCORRECT_EMAIL_OR_PASSWORD = 'Incorrect email or password';
+
+describe('Testa a rota "POST /login"', () => {
 
   before(async () => {
     sinon
       .stub(UsersModel, 'findAll')
       .resolves([{
+        id: 2,
         username: 'User',
         role: 'user',
         email: 'user@user.com',
@@ -31,7 +35,6 @@ describe('Testa a rota "/login"', () => {
   });
 
   const loginData = { email: 'user@user.com', password: 'secret_user' };
-  const INVALID_EMAIL_OR_PASSWORD = 'Invalid email or password !';
 
   it(`Uma requisição na rota "POST /login" passando email e password corretos
     retorna um "token" afirmando que o login foi efetuado`, async () => {
@@ -48,7 +51,7 @@ describe('Testa a rota "/login"', () => {
     const chaiHttpResponse: Response = await chai.request(app)
       .post('/login').send(requestBody);
     expect(chaiHttpResponse.status).to.be.equal(401);
-    expect(chaiHttpResponse.body).to.be.eql({ message: INVALID_EMAIL_OR_PASSWORD }); // ".eql()" serve para comparar objetos;
+    expect(chaiHttpResponse.body).to.be.eql({ message: INCORRECT_EMAIL_OR_PASSWORD }); // ".eql()" serve para comparar objetos;
   });
 
   it(`Uma requisição na rota "POST /login" passando email inválido e password correto
@@ -123,7 +126,6 @@ describe('Testa a rota "/login"', () => {
   });
 
   const loginData = { email: 'user@user.com', password: 'secret_user' };
-  const INVALID_EMAIL_OR_PASSWORD = 'Invalid email or password !';
 
   it(`Uma requisição na rota "POST /login" passando email que não existe e password correto
     retorna um objeto que contém o atributo "message" com uma mensagem de erro`, async () => {
@@ -132,6 +134,48 @@ describe('Testa a rota "/login"', () => {
     const chaiHttpResponse: Response = await chai.request(app)
       .post('/login').send(requestBody);
     expect(chaiHttpResponse.status).to.be.equal(401);
-    expect(chaiHttpResponse.body).to.be.eql({ message: INVALID_EMAIL_OR_PASSWORD });
+    expect(chaiHttpResponse.body).to.be.eql({ message: INCORRECT_EMAIL_OR_PASSWORD });
+  });
+});
+
+describe('Testa a rota "GET /login/validate"', () => {
+  before(async () => {
+    sinon
+      .stub(UsersModel, 'findByPk')
+      .resolves({
+        id: 2,
+        username: 'User',
+        role: 'user',
+        email: 'user@user.com',
+        password: '$2a$08$Y8Abi8jXvsXyqm.rmp0B.uQBA5qUz7T6Ghlg/CvVr/gLxYj5UAZVO',
+      } as UsersModel);
+  });
+
+  after(()=>{
+    (UsersModel.findAll as sinon.SinonStub).restore();
+  });
+
+  it(`Uma requisição na rota "GET /login/validate" passando o token correto no
+  header "Authorization" retorna a função (role) daquele determinado usuário`, async () => {
+    const chaiHttpResponse: Response = await chai.request(app)
+      .get('/login/validate').set('Authorization', validTokenForTests);
+    expect(chaiHttpResponse.status).to.be.equal(200);
+    expect(chaiHttpResponse.body).to.be.eql({ role: 'user' });
+  });
+
+  it(`Uma requisição na rota "GET /login/validate" passando nunhum token no
+  header "Authorization" retorna uma mensagem de erro`, async () => {
+    const chaiHttpResponse: Response = await chai.request(app)
+      .get('/login/validate');
+    expect(chaiHttpResponse.status).to.be.equal(401);
+    expect(chaiHttpResponse.body).to.be.eql({ message: 'Token not found' });
+  });
+
+  it(`Uma requisição na rota "GET /login/validate" passando um token inválido no
+  header "Authorization" retorna uma mensagem de erro`, async () => {
+    const chaiHttpResponse: Response = await chai.request(app)
+      .get('/login/validate').set('Authorization', `${validTokenForTests}E`);;
+    expect(chaiHttpResponse.status).to.be.equal(401);
+    expect(chaiHttpResponse.body).to.be.eql({ message: 'Invalid token' });
   });
 });
