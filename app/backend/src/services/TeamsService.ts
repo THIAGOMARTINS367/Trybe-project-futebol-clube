@@ -1,6 +1,6 @@
-import ITeam from "../interfaces/ITeam";
-import ITeamsRepository from "../interfaces/ITeamsRepository";
-import ITeamsService from "../interfaces/ITeamsService";
+import ITeam from '../interfaces/ITeam';
+import ITeamsRepository from '../interfaces/ITeamsRepository';
+import ITeamsService from '../interfaces/ITeamsService';
 
 class TeamsService implements ITeamsService {
   constructor(private repository: ITeamsRepository) {}
