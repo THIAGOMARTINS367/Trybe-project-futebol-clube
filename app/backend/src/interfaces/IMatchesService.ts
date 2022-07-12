@@ -1,7 +1,7 @@
 import IMatch from './IMatch';
 
 interface IMatchesService {
-  getAllMatches(): Promise<IMatch[]>,
+  getAllMatches(inProgress: string | undefined): Promise<IMatch[]>,
 }
 
 export default IMatchesService;
