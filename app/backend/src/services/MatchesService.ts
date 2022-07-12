@@ -2,7 +2,7 @@ import IMatchesService from '../interfaces/IMatchesService';
 import IMatchesRepository from '../interfaces/IMatchesRepository';
 import IMatch from '../interfaces/IMatch';
 
-class MatchesService implements IMatchesService{
+class MatchesService implements IMatchesService {
   constructor(private repository: IMatchesRepository) {}
 
   async getAllMatches(): Promise<IMatch[]> {
