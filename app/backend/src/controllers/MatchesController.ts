@@ -18,7 +18,7 @@ class MatchesController {
 
   async addMatch(req: Request, res: Response, next: NextFunction) {
     const { body }: { body: INewMatch } = req;
-    const result: INewMatch = await this.service.addMatch(body);
+    const result: INewMatch | IResponseError = await this.service.addMatch(body);
     if (Object.keys(result).includes('error')) {
       return next(result);
     }
