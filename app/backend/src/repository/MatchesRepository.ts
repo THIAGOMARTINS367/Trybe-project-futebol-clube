@@ -40,6 +40,11 @@ class MatchesRepository implements IMatchesRepository {
     );
     return alteredLines[0];
   }
+
+  async getMatchById(id: number): Promise<IMatch | null> {
+    const match: MatchesModel | null = await this.model.findByPk(id);
+    return match ? match.toJSON() as IMatch : match as null;
+  }
 }
 
 export default MatchesRepository;
