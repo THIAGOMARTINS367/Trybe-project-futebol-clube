@@ -33,7 +33,7 @@ class MatchesController {
     if (Object.keys(result).includes('error')) {
       return next(result);
     }
-    res.status(201).json(result);
+    res.status(200).json(result);
   }
 }
 
