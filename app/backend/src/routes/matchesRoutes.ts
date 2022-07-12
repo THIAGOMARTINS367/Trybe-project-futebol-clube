@@ -27,4 +27,8 @@ matchesRouter.post(
   },
 );
 
+matchesRouter.patch('/:id/finish', (req: Request, res: Response, next: NextFunction) => {
+  entityFactory().editMatchProgress(req, res, next);
+});
+
 export default matchesRouter;
