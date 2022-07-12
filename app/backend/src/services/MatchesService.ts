@@ -33,6 +33,11 @@ class MatchesService implements IMatchesService {
         message: 'It is not possible to create a match with two equal teams',
       } };
     }
+    const homeTeamExists = await this.repository.getMatchById(homeTeam);
+    const awayTeamExists = await this.repository.getMatchById(awayTeam);
+    if (!homeTeamExists || !awayTeamExists) {
+      return { error: { code: 404, message: 'There is no team with such id!' } };
+    }
     const newMatche: INewMatch = await this.repository.addMatch(body);
     return newMatche;
   }
