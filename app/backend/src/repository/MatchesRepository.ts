@@ -3,6 +3,7 @@ import TeamsModel from '../database/models/TeamsModel';
 import MatchesModel from '../database/models/MatchesModel';
 import IMatchesRepository from '../interfaces/IMatchesRepository';
 import IMatch from '../interfaces/IMatch';
+import INewMatch from '../interfaces/INewMatch';
 
 class MatchesRepository implements IMatchesRepository {
   constructor(private model = MatchesModel) {}
@@ -22,6 +23,14 @@ class MatchesRepository implements IMatchesRepository {
       }],
     });
     return matches;
+  }
+
+  async addMatch(newUserData: INewMatch): Promise<INewMatch> {
+    const newMatche: MatchesModel = await this.model.create({
+      ...newUserData,
+      inProgress: true,
+    });
+    return newMatche.toJSON() as INewMatch;
   }
 }
 
