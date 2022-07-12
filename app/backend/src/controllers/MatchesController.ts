@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import INewMatch from '../interfaces/INewMatch';
 import IMatch from '../interfaces/IMatch';
 import IMatchesService from '../interfaces/IMatchesService';
 
@@ -12,6 +13,15 @@ class MatchesController {
       return next(result);
     }
     res.status(200).json(result);
+  }
+
+  async addMatch(req: Request, res: Response, next: NextFunction) {
+    const { body }: { body: INewMatch } = req;
+    const result: INewMatch = await this.service.addMatch(body);
+    if (Object.keys(result).includes('error')) {
+      return next(result);
+    }
+    res.status(201).json(result);
   }
 }
 
