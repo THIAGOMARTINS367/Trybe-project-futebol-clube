@@ -1,7 +1,7 @@
 import IMatch from './IMatch';
 
 interface IMatchesRepository {
-  getAllMatches(): Promise<IMatch[]>,
+  getAllMatches(queryParameters: { inProgress: boolean }[]): Promise<IMatch[]>,
 }
 
 export default IMatchesRepository;
