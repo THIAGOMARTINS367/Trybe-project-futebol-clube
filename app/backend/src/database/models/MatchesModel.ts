@@ -45,7 +45,7 @@ MatchesModel.init({
   inProgress: {
     allowNull: false,
     field: 'in_progress',
-    type: DataTypes.INTEGER,
+    type: DataTypes.BOOLEAN,
   },
 }, {
   // ... Outras configs
