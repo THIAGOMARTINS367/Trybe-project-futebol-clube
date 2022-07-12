@@ -9,16 +9,18 @@ class MatchesRepository implements IMatchesRepository {
   async getAllMatches(): Promise<IMatch[]> {
     const matches: IMatch[] = await this.model.findAll({
       include: [{
-        model: TeamsModel, as: 'teamHome',
+        model: TeamsModel,
+        as: 'teamHome',
         attributes: { exclude: ['id'] },
       },
       {
-        model: TeamsModel, as: 'teamAway',
+        model: TeamsModel,
+        as: 'teamAway',
         attributes: { exclude: ['id'] },
-      }]
+      }],
     });
     return matches;
-  };
+  }
 }
 
 export default MatchesRepository;
