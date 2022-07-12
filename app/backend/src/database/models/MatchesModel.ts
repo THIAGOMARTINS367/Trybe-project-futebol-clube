@@ -20,6 +20,7 @@ MatchesModel.init({
   id: {
     primaryKey: true,
     allowNull: false,
+    autoIncrement: true,
     type: DataTypes.INTEGER,
   },
   homeTeam: {
