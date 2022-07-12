@@ -5,8 +5,9 @@ import IMatchesService from '../interfaces/IMatchesService';
 class MatchesController {
   constructor(private service: IMatchesService) {}
 
-  async getAllMatches(_req: Request, res: Response, next: NextFunction) {
-    const result: IMatch[] = await this.service.getAllMatches();
+  async getAllMatches(req: Request, res: Response, next: NextFunction) {
+    const { inProgress }: { inProgress?: string | undefined } = req.query;
+    const result: IMatch[] = await this.service.getAllMatches(inProgress);
     if (Object.keys(result).includes('error')) {
       return next(result);
     }
