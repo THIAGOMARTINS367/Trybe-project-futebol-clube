@@ -32,6 +32,14 @@ class MatchesRepository implements IMatchesRepository {
     });
     return newMatche.toJSON() as INewMatch;
   }
+
+  async editMatchProgress(id: number): Promise<number> {
+    const alteredLines: [number, IMatch[]] = await this.model.update(
+      { inProgress: false },
+      { where: { id } },
+    );
+    return alteredLines[0];
+  }
 }
 
 export default MatchesRepository;
