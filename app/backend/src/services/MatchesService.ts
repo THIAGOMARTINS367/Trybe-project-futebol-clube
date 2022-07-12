@@ -25,7 +25,14 @@ class MatchesService implements IMatchesService {
     return matches;
   }
 
-  async addMatch(body: INewMatch): Promise<INewMatch> {
+  async addMatch(body: INewMatch): Promise<INewMatch | IResponseError> {
+    const { homeTeam, awayTeam } = body;
+    if (homeTeam === awayTeam) {
+      return { error: {
+        code: 401,
+        message: 'It is not possible to create a match with two equal teams',
+      } };
+    }
     const newMatche: INewMatch = await this.repository.addMatch(body);
     return newMatche;
   }
