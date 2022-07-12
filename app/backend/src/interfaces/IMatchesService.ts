@@ -4,7 +4,7 @@ import IResponseError from './IResponseError';
 
 interface IMatchesService {
   getAllMatches(inProgress: string | undefined): Promise<IMatch[]>,
-  addMatch(body: INewMatch): Promise<INewMatch>,
+  addMatch(body: INewMatch): Promise<INewMatch | IResponseError>,
   editMatchProgress(id: number): Promise<{ message: 'Finished' } | IResponseError>,
 }
 
