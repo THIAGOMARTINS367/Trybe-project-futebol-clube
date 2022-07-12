@@ -1,4 +1,5 @@
 import { Model, DataTypes } from 'sequelize';
+import ITeam from '../../interfaces/ITeam';
 import db from '.';
 import TeamsModel from './TeamsModel';
 // import OtherModel from './OtherModel';
@@ -6,11 +7,13 @@ import TeamsModel from './TeamsModel';
 class MatchesModel extends Model {
   // public <campo>!: <tipo>;
   public id: number;
-  public home_team: number;
-  public home_team_goals: number;
-  public away_team: number;
-  public away_team_goals: number;
-  public in_progress: boolean;
+  public homeTeam: number;
+  public homeTeamGoals: number;
+  public awayTeam: number;
+  public awayTeamGoals: number;
+  public inProgress: boolean;
+  public teamHome: ITeam;
+  public teamAway: ITeam;
 }
 
 MatchesModel.init({
@@ -52,11 +55,10 @@ MatchesModel.init({
   timestamps: false,
 });
 
-TeamsModel.belongsTo(MatchesModel, { foreignKey: 'home_team', as: 'matches'});
-TeamsModel.belongsTo(MatchesModel, { foreignKey: 'away_team', as: 'matches'});
+MatchesModel.belongsTo(TeamsModel, { foreignKey: 'homeTeam', as: 'teamHome'});
+MatchesModel.belongsTo(TeamsModel, { foreignKey: 'awayTeam', as: 'teamAway'});
 
-
-MatchesModel.hasMany(TeamsModel, { foreignKey: 'home_team', as: 'teams'});
-MatchesModel.hasMany(TeamsModel, { foreignKey: 'away_team', as: 'teams'});
+TeamsModel.hasMany(MatchesModel, { foreignKey: 'homeTeam', as: 'matchHome'});
+TeamsModel.hasMany(MatchesModel, { foreignKey: 'awayTeam', as: 'matchAway'});
 
 export default MatchesModel;
