@@ -3,6 +3,7 @@ import IMatchesRepository from '../interfaces/IMatchesRepository';
 import IMatch from '../interfaces/IMatch';
 import INewMatch from '../interfaces/INewMatch';
 import IResponseError from '../interfaces/IResponseError';
+import IMatchGoals from '../interfaces/IMatchGoals';
 
 class MatchesService implements IMatchesService {
   constructor(private repository: IMatchesRepository) {}
@@ -43,11 +44,13 @@ class MatchesService implements IMatchesService {
   }
 
   async editMatchProgress(id: number): Promise<{ message: 'Finished' } | IResponseError> {
-    const alteredLines = await this.repository.editMatchProgress(id);
-    if (alteredLines === 0) {
-      return { error: { code: 500, message: `Unable to finish match ${id}` } };
-    }
+    await this.repository.editMatchProgress(id);
     return { message: 'Finished' };
+  }
+
+  async updateMatch(id: number, body: IMatchGoals): Promise<IMatchGoals> {
+    await this.repository.updateMatch(id, body);
+    return { id, ...body };
   }
 }
 
