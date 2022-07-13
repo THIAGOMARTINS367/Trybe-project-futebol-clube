@@ -5,6 +5,7 @@ import IMatchesRepository from '../interfaces/IMatchesRepository';
 import IMatch from '../interfaces/IMatch';
 import INewMatch from '../interfaces/INewMatch';
 import ITeam from '../interfaces/ITeam';
+import IMatchGoals from '../interfaces/IMatchGoals';
 
 class MatchesRepository implements IMatchesRepository {
   constructor(
@@ -48,6 +49,14 @@ class MatchesRepository implements IMatchesRepository {
   async getTeamById(id: number): Promise<ITeam | null> {
     const match: TeamsModel | null = await this.teamsModel.findByPk(id);
     return match ? match.toJSON() as ITeam : match as null;
+  }
+
+  async updateMatch(id: number, { homeTeamGoals, awayTeamGoals }: IMatchGoals): Promise<number> {
+    const alteredLines = await this.model.update(
+      { homeTeamGoals, awayTeamGoals },
+      { where: { id, inProgress: true } },
+    ) as number[];
+    return alteredLines[0];
   }
 }
 
