@@ -24,7 +24,7 @@ class TokenAuthenticator {
       this.req.headers = { ...this.req.headers, userData: JSON.stringify(userData) };
       this.next();
     } catch (error) {
-      this.next({ error: { code: 401, message: 'Invalid token' } });
+      this.next({ error: { code: 401, message: 'Token must be a valid token' } });
     }
   }
 }
