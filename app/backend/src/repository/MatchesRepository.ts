@@ -4,9 +4,13 @@ import MatchesModel from '../database/models/MatchesModel';
 import IMatchesRepository from '../interfaces/IMatchesRepository';
 import IMatch from '../interfaces/IMatch';
 import INewMatch from '../interfaces/INewMatch';
+import ITeam from '../interfaces/ITeam';
 
 class MatchesRepository implements IMatchesRepository {
-  constructor(private model = MatchesModel) {}
+  constructor(
+    private model = MatchesModel,
+    private teamsModel = TeamsModel,
+  ) {}
 
   async getAllMatches(queryParameters: { inProgress: boolean }[]): Promise<IMatch[]> {
     const matches: IMatch[] = await this.model.findAll({
@@ -41,9 +45,9 @@ class MatchesRepository implements IMatchesRepository {
     return alteredLines[0];
   }
 
-  async getMatchById(id: number): Promise<IMatch | null> {
-    const match: MatchesModel | null = await this.model.findByPk(id);
-    return match ? match.toJSON() as IMatch : match as null;
+  async getTeamById(id: number): Promise<ITeam | null> {
+    const match: TeamsModel | null = await this.teamsModel.findByPk(id);
+    return match ? match.toJSON() as ITeam : match as null;
   }
 }
 
