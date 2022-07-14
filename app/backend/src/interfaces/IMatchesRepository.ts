@@ -9,6 +9,7 @@ interface IMatchesRepository {
   editMatchProgress(id: number): Promise<number>,
   getTeamById(id: number): Promise<ITeam | null>,
   updateMatch(id: number, body: IMatchGoals): Promise<number>,
+  getCompletedMatchesOfATeam(teamId: number): Promise<IMatch[]>,
 }
 
 export default IMatchesRepository;
