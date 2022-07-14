@@ -1,3 +1,4 @@
+import ILeaderBoard from './ILeaderBoard';
 import IMatch from './IMatch';
 import IMatchGoals from './IMatchGoals';
 import INewMatch from './INewMatch';
@@ -8,6 +9,7 @@ interface IMatchesService {
   addMatch(body: INewMatch): Promise<INewMatch | IResponseError>,
   editMatchProgress(id: number): Promise<{ message: 'Finished' } | IResponseError>,
   updateMatch(id: number, body: IMatchGoals): Promise<IMatchGoals>,
+  getLeaderboard(): Promise<ILeaderBoard[]>,
 }
 
 export default IMatchesService;
