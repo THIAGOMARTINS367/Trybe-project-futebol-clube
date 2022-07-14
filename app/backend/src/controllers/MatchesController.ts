@@ -47,6 +47,17 @@ class MatchesController {
     }
     res.status(200).json(result);
   }
+
+  async getLeaderboard(_req: Request, res: Response, next: NextFunction) {
+    let result = await this.service.getLeaderboard();
+    if (!result) {
+      result = [];
+    }
+    if (Object.keys(result).includes('error')) {
+      return next(result);
+    }
+    res.status(200).json(result);
+  }
 }
 
 export default MatchesController;
