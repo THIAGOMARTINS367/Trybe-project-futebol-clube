@@ -213,6 +213,22 @@ class MatchesService implements IMatchesService {
     return allMatchesCompleted;
   }
 
+  formatLeaderboard(leaderboard: ILeaderBoard[]) {
+    this.teamId = 0;
+    const teamsName: string[] = leaderboard.map((elementObj) => elementObj.name);
+    const teamsNameFormatted: string[] = [];
+    teamsName.forEach((element: string) => {
+      if (!teamsNameFormatted.includes(element)) teamsNameFormatted.push(element);
+    });
+    const leaderboardFormatted = leaderboard
+      .filter((element: ILeaderBoard, index: number) => element.name === teamsNameFormatted[index]);
+    leaderboardFormatted.sort((prev, curr) => prev.goalsOwn - curr.goalsOwn)
+      .sort((prev, curr) => curr.goalsFavor - prev.goalsFavor)
+      .sort((prev, curr) => curr.goalsBalance - prev.goalsBalance)
+      .sort((prev, curr) => curr.totalVictories - prev.totalVictories);
+    return leaderboardFormatted;
+  }
+
   async getLeaderboard(): Promise<ILeaderBoard[]> {
     const queryParameters: { inProgress: boolean }[] = [{ inProgress: false }];
     const matches: IMatch[] = await this.repository.getAllMatches(queryParameters);
@@ -225,13 +241,7 @@ class MatchesService implements IMatchesService {
         if (completedMatches.length - 1 === index) leaderboard.push(result);
       });
     });
-    const teamsName: string[] = leaderboard.map((elementObj) => elementObj.name);
-    const teamsNameFormatted: string[] = [];
-    teamsName.forEach((element: string) => {
-      if (!teamsNameFormatted.includes(element)) teamsNameFormatted.push(element);
-    });
-    return leaderboard
-      .filter((element: ILeaderBoard, index: number) => element.name === teamsNameFormatted[index]);
+    return this.formatLeaderboard(leaderboard);
   }
 }
 
