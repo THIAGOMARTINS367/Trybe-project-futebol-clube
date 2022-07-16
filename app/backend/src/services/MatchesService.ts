@@ -6,16 +6,10 @@ import IResponseError from '../interfaces/IResponseError';
 import IMatchGoals from '../interfaces/IMatchGoals';
 import ILeaderBoard from '../interfaces/ILeaderBoard';
 import sortLeaderboard from '../utils/sortLeaderboard';
-import { homeAwayTeam } from '../controllers/MatchesController';
-
-type teamHomeAway = 'teamHome' | 'teamAway';
-type PVDraws = { totalPoints: number, totalVictories: number, totalDraws: number };
-type tGgFgoalsOwn = { totalGames: number, goalsFavor: number, goalsOwn: number };
-type tPoTmatchesParameter = {
-  teamParameterName: teamHomeAway,
-  otherTeam: homeAwayTeam,
-  matchesParameter: IMatch[],
-};
+import { homeAwayTeam, teamHomeAway } from '../types/types';
+import IPVDraws from '../interfaces/IPVDraws';
+import ItGgFgoalsOwn from '../interfaces/ItGgFgoalsOwn';
+import ItPoTmatchesParameter from '../interfaces/ItPoTmatchesParameter';
 
 class MatchesService implements IMatchesService {
   constructor(
@@ -70,8 +64,8 @@ class MatchesService implements IMatchesService {
     return { id, ...body };
   }
 
-  getTotalPVDraws(otherTeams: homeAwayTeam, match: IMatch, matches: IMatch[]): PVDraws {
-    const result: PVDraws = { totalPoints: 0, totalVictories: 0, totalDraws: 0 };
+  getTotalPVDraws(otherTeams: homeAwayTeam, match: IMatch, matches: IMatch[]): IPVDraws {
+    const result: IPVDraws = { totalPoints: 0, totalVictories: 0, totalDraws: 0 };
     matches.forEach((matchObj) => {
       const isMatchParameter: boolean = match[this.teamTypeParameter] === matchObj[
         this.teamTypeParameter
@@ -106,8 +100,8 @@ class MatchesService implements IMatchesService {
     otherTeam: homeAwayTeam,
     match: IMatch,
     matches: IMatch[],
-  ): tGgFgoalsOwn {
-    const result: tGgFgoalsOwn = { totalGames: 0, goalsFavor: 0, goalsOwn: 0 };
+  ): ItGgFgoalsOwn {
+    const result: ItGgFgoalsOwn = { totalGames: 0, goalsFavor: 0, goalsOwn: 0 };
     matches.forEach((matchObj) => {
       const isMatchParameter: boolean = match[this.teamTypeParameter] === matchObj[
         this.teamTypeParameter
@@ -123,9 +117,9 @@ class MatchesService implements IMatchesService {
 
   calcLeaderboard(otherTeam: homeAwayTeam, match: IMatch, matches: IMatch[]):
   Omit<ILeaderBoard, 'name'> {
-    const { totalPoints, totalVictories, totalDraws }: PVDraws = this
+    const { totalPoints, totalVictories, totalDraws }: IPVDraws = this
       .getTotalPVDraws(otherTeam, match, matches);
-    const { totalGames, goalsFavor, goalsOwn }: tGgFgoalsOwn = this
+    const { totalGames, goalsFavor, goalsOwn }: ItGgFgoalsOwn = this
       .getTotalGamesGoalsFavorAndOwns(otherTeam, match, matches);
     const totalLosses: number = this.getTotalLosses(otherTeam, match, matches);
     return {
@@ -141,7 +135,7 @@ class MatchesService implements IMatchesService {
     };
   }
 
-  determineTeamType(teamType: homeAwayTeam, matches: IMatch[]): tPoTmatchesParameter {
+  determineTeamType(teamType: homeAwayTeam, matches: IMatch[]): ItPoTmatchesParameter {
     this.teamTypeParameter = teamType;
     const teamParameterName: teamHomeAway = this.teamTypeParameter === 'homeTeam'
       ? 'teamHome' : 'teamAway';
@@ -162,7 +156,7 @@ class MatchesService implements IMatchesService {
     const queryParameters: { inProgress: boolean }[] = [{ inProgress: false }];
     const matches: IMatch[] = await this.repository.getAllMatches(queryParameters);
     const { teamParameterName, otherTeam, matchesParameter }:
-    tPoTmatchesParameter = this.determineTeamType(teamType, matches);
+    ItPoTmatchesParameter = this.determineTeamType(teamType, matches);
     const leaderboard: ILeaderBoard[] = matchesParameter.map((match) => {
       const calcLeaderboard:
       Omit<ILeaderBoard, 'name'> = this.calcLeaderboard(otherTeam, match, matches);
