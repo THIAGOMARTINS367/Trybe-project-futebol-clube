@@ -1,4 +1,4 @@
-import { homeAwayTeam } from '../controllers/MatchesController';
+import { homeAwayTeam } from '../types/types';
 import ILeaderBoard from './ILeaderBoard';
 import IMatch from './IMatch';
 import IMatchGoals from './IMatchGoals';
