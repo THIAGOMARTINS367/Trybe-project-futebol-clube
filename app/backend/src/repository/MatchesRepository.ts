@@ -58,14 +58,6 @@ class MatchesRepository implements IMatchesRepository {
     ) as number[];
     return alteredLines[0];
   }
-
-  async getCompletedMatchesOfATeam(teamId: number): Promise<IMatch[]> {
-    const completedMatches = await this.model.findAll({
-      where: { [Op.or]: [{ homeTeam: teamId }, { awayTeam: teamId }], inProgress: false },
-    });
-    const a = completedMatches.map((obj) => obj.toJSON());
-    return a as IMatch[];
-  }
 }
 
 export default MatchesRepository;
