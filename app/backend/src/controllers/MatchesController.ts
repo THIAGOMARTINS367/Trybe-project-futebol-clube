@@ -4,6 +4,9 @@ import IMatch from '../interfaces/IMatch';
 import IMatchesService from '../interfaces/IMatchesService';
 import IResponseError from '../interfaces/IResponseError';
 import IMatchGoals from '../interfaces/IMatchGoals';
+import ILeaderBoard from '../interfaces/ILeaderBoard';
+
+export type homeAwayTeam = 'homeTeam' | 'awayTeam';
 
 class MatchesController {
   constructor(private service: IMatchesService) {}
@@ -48,8 +51,10 @@ class MatchesController {
     res.status(200).json(result);
   }
 
-  async getLeaderboard(_req: Request, res: Response, next: NextFunction) {
-    let result = await this.service.getLeaderboard();
+  async getLeaderboard(req: Request, res: Response, next: NextFunction) {
+    const { path }: { path: string } = req;
+    const teamsTypeParameter: homeAwayTeam = path === '/home' ? 'homeTeam' : 'awayTeam';
+    let result: ILeaderBoard[] = await this.service.getLeaderboard(teamsTypeParameter);
     if (!result) {
       result = [];
     }
