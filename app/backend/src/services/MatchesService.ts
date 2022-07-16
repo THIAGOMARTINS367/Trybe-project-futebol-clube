@@ -4,13 +4,23 @@ import IMatch from '../interfaces/IMatch';
 import INewMatch from '../interfaces/INewMatch';
 import IResponseError from '../interfaces/IResponseError';
 import IMatchGoals from '../interfaces/IMatchGoals';
-import ILeaderboardMatch from '../interfaces/ILeaderboardMatch';
 import ILeaderBoard from '../interfaces/ILeaderBoard';
+import sortLeaderboard from '../utils/sortLeaderboard';
+import { homeAwayTeam } from '../controllers/MatchesController';
+
+type teamHomeAway = 'teamHome' | 'teamAway';
+type PVDraws = { totalPoints: number, totalVictories: number, totalDraws: number };
+type tGgFgoalsOwn = { totalGames: number, goalsFavor: number, goalsOwn: number };
+type tPoTmatchesParameter = {
+  teamParameterName: teamHomeAway,
+  otherTeam: homeAwayTeam,
+  matchesParameter: IMatch[],
+};
 
 class MatchesService implements IMatchesService {
   constructor(
     private repository: IMatchesRepository,
-    private teamId: number = 0,
+    private teamTypeParameter: homeAwayTeam = 'homeTeam',
   ) { }
 
   async getAllMatches(inProgress: string | undefined): Promise<IMatch[]> {
@@ -60,188 +70,108 @@ class MatchesService implements IMatchesService {
     return { id, ...body };
   }
 
-  getTotalPoints(completedMatches: ILeaderboardMatch[]): number {
-    const totalPoints: number = completedMatches.reduce((acc, curr) => {
-      let points = 0;
-      points += curr.homeTeam === this.teamId
-      && curr.homeTeamGoals === curr.awayTeamGoals ? 1 : 0;
-
-      points += curr.homeTeam === this.teamId
-      && curr.homeTeamGoals > curr.awayTeamGoals ? 3 : 0;
-
-      points += curr.awayTeam === this.teamId
-      && curr.awayTeamGoals === curr.homeTeamGoals ? 1 : 0;
-
-      points += curr.awayTeam === this.teamId
-      && curr.awayTeamGoals > curr.homeTeamGoals ? 3 : 0;
-
-      return acc + points;
-    }, 0);
-    return totalPoints;
-  }
-
-  getTotalVictories(completedMatches: ILeaderboardMatch[]): number {
-    const totalVictories: number = completedMatches.reduce((acc, curr) => {
-      let victories = 0;
-      switch (true) {
-        case curr.homeTeam === this.teamId && curr.homeTeamGoals > curr.awayTeamGoals:
-          victories += 1;
-          break;
-        case curr.awayTeam === this.teamId && curr.awayTeamGoals > curr.homeTeamGoals:
-          victories += 1;
-          break;
-        default:
-          break;
+  getTotalPVDraws(otherTeams: homeAwayTeam, match: IMatch, matches: IMatch[]): PVDraws {
+    const result: PVDraws = { totalPoints: 0, totalVictories: 0, totalDraws: 0 };
+    matches.forEach((matchObj) => {
+      const isMatchParameter: boolean = match[this.teamTypeParameter] === matchObj[
+        this.teamTypeParameter
+      ];
+      const teamsParameterGoals: number = matchObj[`${this.teamTypeParameter}Goals`];
+      if (isMatchParameter && teamsParameterGoals > matchObj[`${otherTeams}Goals`]) {
+        result.totalPoints += 3;
+        result.totalVictories += 1;
       }
-      return acc + victories;
-    }, 0);
-    return totalVictories;
-  }
-
-  getTotalDraws(completedMatches: ILeaderboardMatch[]): number {
-    const totalDraws: number = completedMatches.reduce((acc, curr) => {
-      let draws = 0;
-      switch (true) {
-        case curr.homeTeam === this.teamId && curr.homeTeamGoals === curr.awayTeamGoals:
-          draws += 1;
-          break;
-        case curr.awayTeam === this.teamId && curr.awayTeamGoals === curr.homeTeamGoals:
-          draws += 1;
-          break;
-        default:
-          break;
+      if (isMatchParameter && teamsParameterGoals === matchObj[`${otherTeams}Goals`]) {
+        result.totalPoints += 1;
+        result.totalDraws += 1;
       }
-      return acc + draws;
-    }, 0);
-    return totalDraws;
+    });
+    return result;
   }
 
-  getTotalLosses(completedMatches: ILeaderboardMatch[]): number {
-    const totalLosses: number = completedMatches.reduce((acc, curr) => {
-      let losses = 0;
-      switch (true) {
-        case curr.homeTeam === this.teamId && curr.homeTeamGoals < curr.awayTeamGoals:
-          losses += 1;
-          break;
-        case curr.awayTeam === this.teamId && curr.awayTeamGoals < curr.homeTeamGoals:
-          losses += 1;
-          break;
-        default:
-          break;
+  getTotalLosses(otherTeam: homeAwayTeam, match: IMatch, matches: IMatch[]): number {
+    return matches.reduce((acc, curr: IMatch) => {
+      let result = 0;
+      const isMatchParameter: boolean = match[this.teamTypeParameter] === curr[
+        this.teamTypeParameter
+      ];
+      if (isMatchParameter && curr[`${this.teamTypeParameter}Goals`] < curr[`${otherTeam}Goals`]) {
+        result = 1;
       }
-      return acc + losses;
+      return acc + result;
     }, 0);
-    return totalLosses;
   }
 
-  getGoalsFavor(completedMatches: ILeaderboardMatch[]): number {
-    const goalsFavor: number = completedMatches.reduce((acc, curr) => {
-      let goals = 0;
-      switch (true) {
-        case curr.homeTeam === this.teamId:
-          goals += curr.homeTeamGoals;
-          break;
-        case curr.awayTeam === this.teamId:
-          goals += curr.awayTeamGoals;
-          break;
-        default:
-          break;
+  getTotalGamesGoalsFavorAndOwns(
+    otherTeam: homeAwayTeam,
+    match: IMatch,
+    matches: IMatch[],
+  ): tGgFgoalsOwn {
+    const result: tGgFgoalsOwn = { totalGames: 0, goalsFavor: 0, goalsOwn: 0 };
+    matches.forEach((matchObj) => {
+      const isMatchParameter: boolean = match[this.teamTypeParameter] === matchObj[
+        this.teamTypeParameter
+      ];
+      if (isMatchParameter) {
+        result.totalGames += 1;
+        result.goalsFavor += matchObj[`${this.teamTypeParameter}Goals`];
+        result.goalsOwn += matchObj[`${otherTeam}Goals`];
       }
-      return acc + goals;
-    }, 0);
-    return goalsFavor;
+    });
+    return result;
   }
 
-  getGoalsOwn(completedMatches: ILeaderboardMatch[]): number {
-    const goalsOwn: number = completedMatches.reduce((acc, curr) => {
-      let goals = 0;
-      switch (true) {
-        case curr.homeTeam === this.teamId:
-          goals += curr.awayTeamGoals;
-          break;
-        case curr.awayTeam === this.teamId:
-          goals += curr.homeTeamGoals;
-          break;
-        default:
-          break;
-      }
-      return acc + goals;
-    }, 0);
-    return goalsOwn;
-  }
-
-  getMatchLeaderdboardResult(
-    resultObject: Omit<ILeaderBoard, 'goalsOwn' | 'goalsBalance' | 'efficiency'>,
-    completedMatches: ILeaderboardMatch[],
-  ): ILeaderBoard {
-    const goalsOwn: number = this.getGoalsOwn(completedMatches);
-    const { totalPoints, totalGames, goalsFavor } = resultObject;
+  calcLeaderboard(otherTeam: homeAwayTeam, match: IMatch, matches: IMatch[]):
+  Omit<ILeaderBoard, 'name'> {
+    const { totalPoints, totalVictories, totalDraws }: PVDraws = this
+      .getTotalPVDraws(otherTeam, match, matches);
+    const { totalGames, goalsFavor, goalsOwn }: tGgFgoalsOwn = this
+      .getTotalGamesGoalsFavorAndOwns(otherTeam, match, matches);
+    const totalLosses: number = this.getTotalLosses(otherTeam, match, matches);
     return {
-      ...resultObject,
+      totalPoints,
+      totalGames,
+      totalVictories,
+      totalDraws,
+      totalLosses,
+      goalsFavor,
       goalsOwn,
       goalsBalance: goalsFavor - goalsOwn,
       efficiency: Math.round(((totalPoints / (totalGames * 3)) * 100) * 100) / 100,
     };
   }
 
-  generateMatchLeaderboard(
-    completedMatches: ILeaderboardMatch[],
-    completedMatchObj: ILeaderboardMatch,
-  ) {
-    const { teamHomeName, homeTeamId } = completedMatchObj;
-    this.teamId = homeTeamId;
-    return this.getMatchLeaderdboardResult({
-      name: teamHomeName,
-      totalPoints: this.getTotalPoints(completedMatches),
-      totalGames: completedMatches.length,
-      totalVictories: this.getTotalVictories(completedMatches),
-      totalDraws: this.getTotalDraws(completedMatches),
-      totalLosses: this.getTotalLosses(completedMatches),
-      goalsFavor: this.getGoalsFavor(completedMatches),
-    }, completedMatches);
+  determineTeamType(teamType: homeAwayTeam, matches: IMatch[]): tPoTmatchesParameter {
+    this.teamTypeParameter = teamType;
+    const teamParameterName: teamHomeAway = this.teamTypeParameter === 'homeTeam'
+      ? 'teamHome' : 'teamAway';
+    const otherTeam: homeAwayTeam = this.teamTypeParameter === 'homeTeam'
+      ? 'awayTeam' : 'homeTeam';
+    const matchesParameter: IMatch[] = matches.reduce((acc: IMatch[], curr: IMatch):
+    IMatch[] => {
+      const result: IMatch[] = acc;
+      if (!acc.find((match) => match[this.teamTypeParameter] === curr[this.teamTypeParameter])) {
+        result.push(curr);
+      }
+      return result;
+    }, []);
+    return { teamParameterName, otherTeam, matchesParameter };
   }
 
-  async getAllMatchesCompleted(matches: IMatch[]): Promise<ILeaderboardMatch[][]> {
-    const allMatchesCompleted: ILeaderboardMatch[][] = await Promise.all(
-      matches.map(async ({ homeTeam, teamHome: { teamName } }: IMatch) => {
-        const completedMatches: Omit<IMatch[], 'teamHome' | 'teamAway'> = await this.repository
-          .getCompletedMatchesOfATeam(homeTeam);
-        return completedMatches
-          .map((obj: IMatch) => ({ homeTeamId: homeTeam, teamHomeName: teamName, ...obj }));
-      }),
-    );
-    return allMatchesCompleted;
-  }
-
-  formatLeaderboard(leaderboard: ILeaderBoard[]) {
-    this.teamId = 0;
-    const teamsName: string[] = leaderboard.map((elementObj) => elementObj.name);
-    const teamsNameFormatted: string[] = [];
-    teamsName.forEach((element: string) => {
-      if (!teamsNameFormatted.includes(element)) teamsNameFormatted.push(element);
-    });
-    const leaderboardFormatted = leaderboard
-      .filter((element: ILeaderBoard, index: number) => element.name === teamsNameFormatted[index]);
-    leaderboardFormatted.sort((prev, curr) => prev.goalsOwn - curr.goalsOwn)
-      .sort((prev, curr) => curr.goalsFavor - prev.goalsFavor)
-      .sort((prev, curr) => curr.goalsBalance - prev.goalsBalance)
-      .sort((prev, curr) => curr.totalVictories - prev.totalVictories);
-    return leaderboardFormatted;
-  }
-
-  async getLeaderboard(): Promise<ILeaderBoard[]> {
+  async getLeaderboard(teamType: homeAwayTeam): Promise<ILeaderBoard[]> {
     const queryParameters: { inProgress: boolean }[] = [{ inProgress: false }];
     const matches: IMatch[] = await this.repository.getAllMatches(queryParameters);
-    const leaderboard: ILeaderBoard[] = [];
-    const allMatchesCompleted: ILeaderboardMatch[][] = await this.getAllMatchesCompleted(matches);
-    allMatchesCompleted.forEach((completedMatches: ILeaderboardMatch[]) => {
-      completedMatches.forEach((completedMatchObj: ILeaderboardMatch, index: number) => {
-        const result:
-        ILeaderBoard = this.generateMatchLeaderboard(completedMatches, completedMatchObj);
-        if (completedMatches.length - 1 === index) leaderboard.push(result);
-      });
+    const { teamParameterName, otherTeam, matchesParameter }:
+    tPoTmatchesParameter = this.determineTeamType(teamType, matches);
+    const leaderboard: ILeaderBoard[] = matchesParameter.map((match) => {
+      const calcLeaderboard:
+      Omit<ILeaderBoard, 'name'> = this.calcLeaderboard(otherTeam, match, matches);
+      return {
+        name: match[teamParameterName].teamName,
+        ...calcLeaderboard,
+      };
     });
-    return this.formatLeaderboard(leaderboard);
+    return sortLeaderboard(leaderboard);
   }
 }
 
