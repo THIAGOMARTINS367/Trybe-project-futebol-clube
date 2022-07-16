@@ -5,8 +5,7 @@ import IMatchesService from '../interfaces/IMatchesService';
 import IResponseError from '../interfaces/IResponseError';
 import IMatchGoals from '../interfaces/IMatchGoals';
 import ILeaderBoard from '../interfaces/ILeaderBoard';
-
-export type homeAwayTeam = 'homeTeam' | 'awayTeam';
+import { homeAwayTeam } from '../types/types';
 
 class MatchesController {
   constructor(private service: IMatchesService) {}
