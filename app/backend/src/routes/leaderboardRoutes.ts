@@ -16,4 +16,8 @@ leaderboardRoutes.get('/home', (req: Request, res: Response, next: NextFunction)
   entityFactory().getLeaderboard(req, res, next);
 });
 
+leaderboardRoutes.get('/away', (req: Request, res: Response, next: NextFunction) => {
+  entityFactory().getLeaderboard(req, res, next);
+});
+
 export default leaderboardRoutes;
