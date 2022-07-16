@@ -1,3 +1,4 @@
+import { homeAwayTeam } from '../controllers/MatchesController';
 import ILeaderBoard from './ILeaderBoard';
 import IMatch from './IMatch';
 import IMatchGoals from './IMatchGoals';
@@ -9,7 +10,7 @@ interface IMatchesService {
   addMatch(body: INewMatch): Promise<INewMatch | IResponseError>,
   editMatchProgress(id: number): Promise<{ message: 'Finished' } | IResponseError>,
   updateMatch(id: number, body: IMatchGoals): Promise<IMatchGoals>,
-  getLeaderboard(): Promise<ILeaderBoard[]>,
+  getLeaderboard(teamType: homeAwayTeam): Promise<ILeaderBoard[]>,
 }
 
 export default IMatchesService;
