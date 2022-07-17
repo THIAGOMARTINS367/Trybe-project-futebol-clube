@@ -20,4 +20,8 @@ leaderboardRoutes.get('/away', (req: Request, res: Response, next: NextFunction)
   entityFactory().getLeaderboard(req, res, next);
 });
 
+leaderboardRoutes.get('/', (req: Request, res: Response, next: NextFunction): void => {
+  entityFactory().getGeneralLeaderboard(req, res, next);
+});
+
 export default leaderboardRoutes;
