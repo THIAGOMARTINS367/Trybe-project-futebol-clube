@@ -15,6 +15,7 @@ class MatchesService implements IMatchesService {
   constructor(
     private repository: IMatchesRepository,
     private teamTypeParameter: homeAwayTeam = 'homeTeam',
+    private elementIndex: number = 0,
   ) { }
 
   async getAllMatches(inProgress: string | undefined): Promise<IMatch[]> {
@@ -166,6 +167,44 @@ class MatchesService implements IMatchesService {
       };
     });
     return sortLeaderboard(leaderboard);
+  }
+
+  calculateOverallScore(scoreboards: ILeaderBoard[], currScoreboard: ILeaderBoard): ILeaderBoard {
+    const totalPoints: number = scoreboards[this.elementIndex].totalPoints
+      + currScoreboard.totalPoints;
+    const totalGames: number = scoreboards[this.elementIndex].totalGames
+      + currScoreboard.totalGames;
+    return {
+      ...scoreboards[this.elementIndex],
+      totalPoints,
+      totalGames: scoreboards[this.elementIndex].totalGames + currScoreboard.totalGames,
+      totalVictories: scoreboards[this.elementIndex].totalVictories + currScoreboard.totalVictories,
+      totalDraws: scoreboards[this.elementIndex].totalDraws + currScoreboard.totalDraws,
+      totalLosses: scoreboards[this.elementIndex].totalLosses + currScoreboard.totalLosses,
+      goalsFavor: scoreboards[this.elementIndex].goalsFavor + currScoreboard.goalsFavor,
+      goalsOwn: scoreboards[this.elementIndex].goalsOwn + currScoreboard.goalsOwn,
+      goalsBalance: scoreboards[this.elementIndex].goalsBalance + currScoreboard.goalsBalance,
+      efficiency: Math.round(((totalPoints / (totalGames * 3)) * 100) * 100) / 100,
+    };
+  }
+
+  async getGeneralLeaderboard(): Promise<ILeaderBoard[]> {
+    const homeTeamsLeaderboard: ILeaderBoard[] = await this.getLeaderboard('homeTeam');
+    const awayTeamsLeaderboard: ILeaderBoard[] = await this.getLeaderboard('awayTeam');
+    let generalLeaderboardTeams:
+    ILeaderBoard[] = [...homeTeamsLeaderboard, ...awayTeamsLeaderboard];
+    generalLeaderboardTeams = generalLeaderboardTeams
+      .reduce((acc: ILeaderBoard[], curr: ILeaderBoard): ILeaderBoard[] => {
+        const result: ILeaderBoard[] = [...acc];
+        if (!result.find((elementObj): boolean => elementObj.name === curr.name)) {
+          result.push(curr);
+        } else {
+          this.elementIndex = result.findIndex((scoreboardObj) => scoreboardObj.name === curr.name);
+          result[this.elementIndex] = this.calculateOverallScore(result, curr);
+        }
+        return result;
+      }, []);
+    return sortLeaderboard(generalLeaderboardTeams);
   }
 }
 
