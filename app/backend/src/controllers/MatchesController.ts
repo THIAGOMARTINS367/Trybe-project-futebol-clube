@@ -53,10 +53,15 @@ class MatchesController {
   async getLeaderboard(req: Request, res: Response, next: NextFunction) {
     const { path }: { path: string } = req;
     const teamsTypeParameter: homeAwayTeam = path === '/home' ? 'homeTeam' : 'awayTeam';
-    let result: ILeaderBoard[] = await this.service.getLeaderboard(teamsTypeParameter);
-    if (!result) {
-      result = [];
+    const result: ILeaderBoard[] = await this.service.getLeaderboard(teamsTypeParameter);
+    if (Object.keys(result).includes('error')) {
+      return next(result);
     }
+    res.status(200).json(result);
+  }
+
+  async getGeneralLeaderboard(_req: Request, res: Response, next: NextFunction): Promise<void> {
+    const result: ILeaderBoard[] = await this.service.getGeneralLeaderboard();
     if (Object.keys(result).includes('error')) {
       return next(result);
     }
