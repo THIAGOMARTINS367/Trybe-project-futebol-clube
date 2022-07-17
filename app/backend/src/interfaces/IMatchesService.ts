@@ -11,6 +11,7 @@ interface IMatchesService {
   editMatchProgress(id: number): Promise<{ message: 'Finished' } | IResponseError>,
   updateMatch(id: number, body: IMatchGoals): Promise<IMatchGoals>,
   getLeaderboard(teamType: homeAwayTeam): Promise<ILeaderBoard[]>,
+  getGeneralLeaderboard(): Promise<ILeaderBoard[]>,
 }
 
 export default IMatchesService;
