@@ -16,25 +16,27 @@ const { expect } = chai;
 
 const INCORRECT_EMAIL_OR_PASSWORD = 'Incorrect email or password';
 
+const userDbData = {
+  id: 2,
+  username: 'User',
+  role: 'user',
+  email: 'user@user.com',
+  password: '$2a$08$Y8Abi8jXvsXyqm.rmp0B.uQBA5qUz7T6Ghlg/CvVr/gLxYj5UAZVO',
+};
+
+const loginData = { email: 'user@user.com', password: 'secret_user' };
+
 describe('Testa a rota "POST /login"', () => {
 
   before(async () => {
     sinon
       .stub(UsersModel, 'findAll')
-      .resolves([{
-        id: 2,
-        username: 'User',
-        role: 'user',
-        email: 'user@user.com',
-        password: '$2a$08$Y8Abi8jXvsXyqm.rmp0B.uQBA5qUz7T6Ghlg/CvVr/gLxYj5UAZVO',
-      }] as UsersModel[]);
+      .resolves([userDbData] as UsersModel[]);
   });
 
   after(()=>{
     (UsersModel.findAll as sinon.SinonStub).restore();
   });
-
-  const loginData = { email: 'user@user.com', password: 'secret_user' };
 
   it(`Uma requisição na rota "POST /login" passando email e password corretos
     retorna um "token" afirmando que o login foi efetuado`, async () => {
@@ -125,8 +127,6 @@ describe('Testa a rota "/login"', () => {
     (UsersModel.findAll as sinon.SinonStub).restore();
   });
 
-  const loginData = { email: 'user@user.com', password: 'secret_user' };
-
   it(`Uma requisição na rota "POST /login" passando email que não existe e password correto
     retorna um objeto que contém o atributo "message" com uma mensagem de erro`, async () => {
     const requestBody = { ...loginData };
@@ -142,13 +142,7 @@ describe('Testa a rota "GET /login/validate"', () => {
   before(async () => {
     sinon
       .stub(UsersModel, 'findByPk')
-      .resolves({
-        id: 2,
-        username: 'User',
-        role: 'user',
-        email: 'user@user.com',
-        password: '$2a$08$Y8Abi8jXvsXyqm.rmp0B.uQBA5qUz7T6Ghlg/CvVr/gLxYj5UAZVO',
-      } as UsersModel);
+      .resolves(userDbData as UsersModel);
   });
 
   after(()=>{
@@ -174,8 +168,8 @@ describe('Testa a rota "GET /login/validate"', () => {
   it(`Uma requisição na rota "GET /login/validate" passando um token inválido no
   header "Authorization" retorna uma mensagem de erro`, async () => {
     const chaiHttpResponse: Response = await chai.request(app)
-      .get('/login/validate').set('Authorization', `${validTokenForTests}E`);;
+      .get('/login/validate').set('Authorization', `${validTokenForTests}E`);
     expect(chaiHttpResponse.status).to.be.equal(401);
-    expect(chaiHttpResponse.body).to.be.eql({ message: 'Invalid token' });
+    expect(chaiHttpResponse.body).to.be.eql({ message: 'Token must be a valid token' });
   });
 });
