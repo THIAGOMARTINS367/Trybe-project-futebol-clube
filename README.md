@@ -177,10 +177,10 @@ Na sua máquina você deve ter:
 <details id='sequelize'>
   <summary><strong>🎲 Sequelize</strong></summary>
   <br/>
+  
+  ![Exemplo banco de dados](assets/er-diagram.png)
 
-  Para o desenvolvimento, o time de produto disponibilizou um *Diagrama de Entidade-Relacionamento (DER)* para construir a modelagem do banco de dados. 
- 
-    ![Exemplo banco de dados](assets/er-diagram.png)
+  Para o desenvolvimento, o time de produto disponibilizou um *Diagrama de Entidade-Relacionamento (DER)* para construir a modelagem do banco de dados.
 
   ⚠️ O `package.json` do diretório `app/backend` contém um script `db:reset` que é responsável por "dropar" o banco, recriar e executar as _migrations_ e _seeders_. Você pode executá-lo com o commando `npm run db:reset` se por algum motivo precisar recriar a base de dados;
 
