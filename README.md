@@ -1,8 +1,12 @@
-# Boas vindas ao repositório do Trybe Futebol Clube!
+# Descrição
 
-<details>
+Este projeto foi desenvolvido durante o período de Curso da Trybe 🚀
 
-<summary><strong> Descrição Geral</strong></summary><br />
+⚠️ **Projeto Individual**
+
+O projeto tem por objetivo a avaliação e prática dos conhecimentos adquiridos na Trybe, visando o cumprimento do requisitos solicitados pela mesma.
+
+### *ATENÇÃO: Para utilizar a aplicação acesse o link no canto direito em "About"*.
 
 ---
 
@@ -43,8 +47,6 @@ Foi desenvolvido uma "API Node" para um site informativo sobre partidas e classi
 ### *Em produção*...
 
 ---
-
-</details>
 
 <details>
 <summary><strong>Contexto Inicial para o Desenvolvimento</strong></summary><br />
