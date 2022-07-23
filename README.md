@@ -44,7 +44,13 @@ Foi desenvolvido uma "API Node" para um site informativo sobre partidas e classi
 
 ## Desmontração de Uso
 
-### *Em produção*...
+#### PARTE 1
+![Apresentção-01](assets/my-presentation-01.gif)
+
+---
+
+#### PARTE 2
+![Apresentção-02](assets/my-presentation-02.gif)
 
 ---
 
